@@ -19,7 +19,7 @@ MyBatis-Plus ( 简称 MP ) 是一款基于 MyBatis 的增强工具，他并不�
 
 
 
-## 快速入门初体验
+## 1.快速入门初体验
 
 跟着官方文档进行一次 MP 的快速入门体验：
 
@@ -86,6 +86,17 @@ ALTER TABLE T_USER ADD DELETED INT(1) DEFAULT 1;
 
 **3. **配置数据库连接
 
+```yml
+spring:
+  datasource:
+    druid:  //这里可以选择更换数据源
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/reg?serverTimezone=UTC&characterEncoding=utf8
+      username: "root"
+      password: "root"
+      这个是配置数据源的
+```
+
 ~~~properties
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 spring.datasource.url=jdbc:mysql:///zhe
@@ -98,6 +109,10 @@ mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
 > 开始编码
 
 在我们把数据库以及程序都布置好了之后，我们尝试做一次简单的查询：
+
+![image-20230114210949921](typora图片/image-20230114210949921.png)
+
+![image-20230114211037684](typora图片/image-20230114211037684.png)
 
 **1. **创建实体类以及 dao 接口
 
@@ -116,9 +131,11 @@ public class User {
 
 ~~~java
 // 创建dao接口
-@Mapper
-@Repository
-public interface UserDao extends BaseMapper<User> { }
+@Mapper   
+@Repository    这里可以直接写一个@Mapper就可以直接扫描了
+public interface UserDao extends BaseMapper<User> {
+      // 要继承BaseMapper<User>   <> 这个里面填什么实体对应的就操作那张表
+}
 ~~~
 
 **3. **接下来我们在测试类中书写代码即可：
@@ -140,9 +157,20 @@ class Springboot01MybatisPlusApplicationTests {
 
 查询就这么简单的完成了！
 
+## 2.配置日志
 
+![image-20230114211948436](typora图片/image-20230114211948436.png)
 
-## 快速CRUD练习
+```yml
+#配置日志
+mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
+```
+
+![image-20230114212051046](typora图片/image-20230114212051046.png)
+
+![image-20230114212617794](typora图片/image-20230114212617794.png)
+
+## 3.快速CRUD练习
 
 > insert 插入
 
@@ -156,10 +184,11 @@ class Springboot01Test {
    @Test
    void contextLoads() {
       User user = new User();
-      user.setName("张涵哲");
+      user.setName("1");
       user.setAge(50);
       user.setEmail("zhang_hanzhe@qq.com");
-      ud.insert(user);
+      ud.insert(user);//帮我们自动生成id
+        System.out.println(user);//发现id会自动回填
    }
 }
 ```
@@ -176,7 +205,7 @@ class Springboot01Test {
    @Test
    void contextLoads() {
       User user = new User();
-      user.setName("张涵哲");
+      user.setName("1");
       user.setAge(21);
       user.setEmail("zhang_hanzhe@qq.com");
       ud.updateById(user);
@@ -234,11 +263,180 @@ class Springboot01Test {
 }
 ```
 
+## 4.主键生成策略
+
+<img src="typora图片/image-20230114222311429.png" alt="image-20230114222311429" style="zoom:50%;" />
 
 
-## 常用注解学习
 
-### TableName注解
+![image-20230114212842363](typora图片/image-20230114212842363.png)
+
+![image-20230114213145166](typora图片/image-20230114213145166.png)
+
+![image-20230114213256482](typora图片/image-20230114213256482.png)
+
+![image-20230114213359141](typora图片/image-20230114213359141.png)
+
+### 4.1自动填充
+
+![image-20230114214118964](typora图片/image-20230114214118964.png)
+
+![image-20230114214659765](typora图片/image-20230114214659765.png)
+
+![image-20230114215150575](typora图片/image-20230114215150575.png)
+
+![image-20230114215159602](typora图片/image-20230114215159602.png)
+
+
+
+![image-20230114215947196](typora图片/image-20230114215947196.png)
+
+```java
+@Slf4j //查看日志
+@Component //spring进行托管
+public class MyMetaObjectHandler implements MetaObjectHandler {
+    //插入时的填充策略
+    @Override
+    public void insertFill(MetaObject metaObject) {
+        //插入的时候要更新这两条数据
+        this.setFieldValByName("createTime",new Date(),metaObject);
+        this.setFieldValByName("updateTime",new Date(),metaObject);
+    }
+
+    //更新时的填充策略
+    @Override
+    public void updateFill(MetaObject metaObject) {
+        //更新的时候只要修改这一条数据
+        this.setFieldValByName("updateTime",new Date(),metaObject);
+    }
+}
+```
+
+![image-20230117200528185](typora图片/image-20230117200528185.png)
+
+```java
+public enum FieldFill {
+    /**
+     * 默认不处理
+     */
+    DEFAULT,
+    /**
+     * 插入时填充字段
+     */
+    INSERT,
+    /**
+     * 更新时填充字段
+     */
+    UPDATE,
+    /**
+     * 插入和更新时填充字段
+     */
+    INSERT_UPDATE
+}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+### 4.2乐观锁
+
+![image-20230117192444118](typora图片/image-20230117192444118.png)
+
+![image-20230117192952434](typora图片/image-20230117192952434.png)
+
+![image-20230117193507198](typora图片/image-20230117193507198.png)
+
+![image-20230117193959684](typora图片/image-20230117193959684.png)
+
+3.注册乐观锁
+
+```java
+/**
+ * 注册乐观锁
+ */
+@Bean
+public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+    interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+    return interceptor;
+}
+```
+
+
+
+### 4.3分页查询
+
+![image-20230117204833756](typora图片/image-20230117204833756.png)
+
+![image-20230117210335114](typora图片/image-20230117210335114.png)
+
+```java
+/**
+ MP分页查询工具类
+ */
+@Configuration
+public class MybatisPlusConfig {
+
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor(){
+        MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+        mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+        return mybatisPlusInterceptor;
+    }
+}
+```
+
+![image-20230117211808734](typora图片/image-20230117211808734.png)
+
+### 4.4逻辑删除
+
+![image-20230117212052022](typora图片/image-20230117212052022.png)
+
+在aplication.yml中进行配置
+
+```yaml
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: flag # 全局逻辑删除的实体字段名(since 3.3.0,配置后可以忽略不配置步骤2)
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+```
+
+![image-20230117212355614](typora图片/image-20230117212355614.png)
+
+**查询的时候会自动过滤掉被逻辑删除的字段**
+
+### 4.5性能分析插件
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 5常用注解学习
+
+### 5.1TableName注解
 
 刚刚我们快速过了一遍 CRUD，表名和实体类是对应的，如果我们稍作修改的话再来尝试一下：
 
@@ -264,7 +462,7 @@ public class UserEntity { ... }
 
 查询成功！该注解主要用于实体类和表名称的绑定，除此之外还有其他功能但并不常用，如有需要去查官方文档
 
-### TableId 主键注解
+### 5.2TableId 主键注解
 
 仔细看之前的插入语句会发现有一个细节：==我们并没有为这个对象设置 ID，但是数据库中却存进去了 ID==，这是因为 MP 会对表中的主键自动生成一个 ID，关于主键自动填充我们需要了解一下 `@TableId` 主键注解
 
@@ -295,7 +493,7 @@ public class UserEntity{
 
 
 
-### TableField 非主键注解
+### 5.3TableField 非主键注解
 
 既然由主键注解，当然也就有非主键注解 `@TableField`，一般用来绑定库内的字段名，还可以进行一些高级操作
 
@@ -369,7 +567,7 @@ public class UserEntity{
 
 
 
-### Version 乐观锁
+### 5.4Version 乐观锁
 
 所谓乐观锁就是在数据库中添加一个列作为标识列，一般为 version，在进行 upd ate 之前先进行 select 查询，如果查询的 version 和更新时的 version 是一致的就证明没人操作过这行记录，那么就进行修改，并且修改 version 列，如果查询时和修改时的列不一致就证明有人进行了修改，为了防止脏读就会取消更新。
 
@@ -453,7 +651,7 @@ class Springboot01Test {
 
 
 
-### TableLogic 逻辑删除
+### 5.5TableLogic 逻辑删除
 
 当我们在页面中删除某个数据的时候，往往不是真的删除，而是通过修改某个字段让用户不在读取，因为在某些业务中被删除的数据也有存在的价值
 
@@ -510,7 +708,7 @@ class Springboot01Test {
 
 
 
-### 常用注解小总结
+### 5.6常用注解小总结
 
 | 注解        | 作用                                                         |
 | ----------- | ------------------------------------------------------------ |
@@ -522,9 +720,9 @@ class Springboot01Test {
 
 
 
-## 高级查询学习
+## 6.高级查询学习
 
-### Page 分页查询
+### 6.1Page 分页查询
 
 我们在使用 mybatis 的时候使用的分页插件是第三方的 `PageHelper` 分页插件，而在 MP 中为我们内置了一个分页插件，我们只需要将它配置进来就可以使用了
 
@@ -591,7 +789,7 @@ class Springboot09ApplicationTests {
 
 
 
-### Wrapper 条件构造器
+### 6.2Wrapper 条件构造器
 
 wrapper 条件构造器，它可以帮助我们完成 SQL 中的绝大多数操作，例如大于等于，小于，区间以及模糊查询，对应的条件构造器为 `QueryWrapper`，修改操作同样也有对应的条件构造器 `UpdateWrapper`
 
@@ -647,7 +845,7 @@ QueryWrapper<UserEntity> wrapper = new QueryWrapper<>();
 
 
 
-## 映射mapper.xml
+## 7.映射mapper.xml
 
 开始的时候也说了，MP 是基于 mybatis 框架进行的增强，也就是说除了之前那些功能之外我们还是可以把它当成 mybatis 使用的，可以配置 mapper.xml 映射文件，接下来我们就来配置 xml 开发：
 
@@ -666,3 +864,7 @@ mybatis-plus:
 ~~~
 
 然后在目标位置创建 mapper 文件绑定接口进行调用即可，和 mybatis 是一样的流程
+
+![image-20230117215743925](typora图片/image-20230117215743925.png)
+
+![image-20230117215826215](typora图片/image-20230117215826215.png)
