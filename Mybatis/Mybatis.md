@@ -384,7 +384,7 @@ password = root
 ```java
     <!--起别名  给实体类取别名-->
     <typeAliases>
-        <package name="com.Pojo"/> 也jiu
+        <package name="com.Pojo"/> 
     </typeAliases>
 ```
 
