@@ -127,7 +127,7 @@ MySQL的安装过程中，除了会使用Linux命令外，还会使用到少量�
 
 MySQL的安装我们可以通过前面学习的yum命令进行。
 
-
+**yum list installed 搜索已安装的所有包**![image-20230224111036566](typora图片/image-20230224111036566.png)
 
 ### 安装
 
@@ -210,6 +210,7 @@ MySQL的安装我们可以通过前面学习的yum命令进行。
    ```sql
    # 在MySQL控制台内执行
    ALTER USER 'root'@'localhost' IDENTIFIED BY '密码';	-- 密码需要符合：大于8位，有大写字母，有特殊符号，不能是连续的简单语句如123，abc
+   本机密码：：Root1234$
    ```
 
 4. [扩展]，配置root的简单密码
@@ -225,6 +226,7 @@ MySQL的安装我们可以通过前面学习的yum命令进行。
    
    # 然后就可以用简单密码了（课程中使用简单密码，为了方便，生产中不要这样）
    ALTER USER 'root'@'localhost' IDENTIFIED BY '简单密码';
+   密码root
    ```
 
 5. [扩展]，配置root运行远程登录
@@ -726,7 +728,7 @@ Tomcat的安装非常简单，主要分为2部分：
 
    ==在弹出的页面中输入Oracle的账户密码即可下载（如无账户，请自行注册，注册是免费的）==
 
-2. 登陆Linux系统，切换到root用户
+2. 登陆Linux系统，切换到root用户![image-20230315113907363](typora图片/image-20230315113907363.png)
 
    ![](https://image-set.oss-cn-zhangjiakou.aliyuncs.com/img-out/2022/10/17/20221017163607.png)
 
@@ -750,14 +752,16 @@ Tomcat的安装非常简单，主要分为2部分：
 
    ```shell
    ln -s /export/server/jdk1.8.0_351 /export/server/jdk
+   ln -s /home/java/jdk1.8.0_181 /home/java/jdk
    ```
 
 7. 配置JAVA_HOME环境变量，以及将$JAVA_HOME/bin文件夹加入PATH环境变量中
 
    ```shell
    # 编辑/etc/profile文件
-   export JAVA_HOME=/export/server/jdk
-   export PATH=$PATH:$JAVA_HOME/bin
+   export JAVA_HOME=/export/server/jdk1.8.0_181
+   export PATH=$JAVA_HOME/bin:$PATH
+   export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
    ```
 
 8. 生效环境变量
@@ -778,6 +782,7 @@ Tomcat的安装非常简单，主要分为2部分：
 10. 执行验证：
 
     ```shell
+    yum install java-1.8.0-openjdk-devel.x86_64 //在执行这个
     java -version
     javac -version
     ```
@@ -859,9 +864,11 @@ Tomcat的安装非常简单，主要分为2部分：
    ```shell
    # 使用root用户操作，同时对软链接和tomcat安装文件夹进行修改，使用通配符*进行匹配
    chown -R tomcat:tomcat /export/server/*tomcat*
+   #在bin目录下 执行该命令
+   chmod u+x *.sh
    ```
 
-7. 切换到tomcat用户
+7. 切换到tomcat用户![image-20230315002108742](typora图片/image-20230315002108742.png)
 
    ```shell
    su - tomcat
@@ -893,7 +900,80 @@ Tomcat的安装非常简单，主要分为2部分：
 
 至此，Tomcat安装配置完成。
 
+![image-20230315005439440](typora图片/image-20230315005439440.png)
 
+**3、进入 apache-tomcat-9.0.65/bin 目录下**
+
+执行 chmod 777 ./* 命令将当前目录下的所有文件提至最高权限。
+
+4、配置环境变量
+
+```vim
+root@localhost ~]# vim /etc/profile 
+```
+
+添加以下内容：
+
+```vim
+#tomcat
+export TOMCAT_HOME=/usr/local/tomcat/apache-tomcat-9.0.65
+
+export CATALINA_HOME=/usr/local/tomcat/apache-tomcat-9.0.65
+```
+
+ 此外：
+
+```vim
+[root@localhost ~]# vim /usr/local/tomcat/apache-tomcat-9.0.65/bin/setclasspath.sh
+```
+
+添加以下内容：
+
+```vim
+export JAVA_HOME=/usr/local/java/jdk1.8.0_341
+
+export JRE_HOME=${JAVA_HOME}/jre
+```
+
+5、开放8080端口
+
+6、启动tomcat
+
+进入 tomcat/bin 目录下执行 ./startup.sh 命令
+
+```vim
+[root@localhost bin]# ./startup.sh
+Using CATALINA_BASE:   /usr/local/tomcat/apache-tomcat-9.0.65
+Using CATALINA_HOME:   /usr/local/tomcat/apache-tomcat-9.0.65
+Using CATALINA_TMPDIR: /usr/local/tomcat/apache-tomcat-9.0.65/temp
+Using JRE_HOME:        /usr/local/java/jdk1.8.0_341/jre
+Using CLASSPATH:       /usr/local/tomcat/apache-tomcat-9.0.65/bin/bootstrap.jar:/usr/local/tomcat/apache-tomcat-9.0.65/bin/tomcat-juli.jar
+Using CATALINA_OPTS:   
+Tomcat started.
+```
+
+启动成功，可以访问：
+
+![image-20230315193308816](typora图片/image-20230315193308816.png)
+
+```linux
+yum install httpd
+systemctl enable httpd
+systemctl start httpd
+```
+
+![image-20230315195108360](typora图片/image-20230315195108360.png)
+
+```linux
+unset i
+unset -f pathmunge
+export JAVA_HOME=/usr/local/java/jdk1.8.0_221
+export JRE_HOME=${JAVA_HOME}/jre
+export CATALINA_HOME=/usr/local/tomcat8
+export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib:$CLASSPATH
+export JAVA_PATH=${JAVA_HOME}/bin:${JRE_HOME}/bin:${CATALINA_HOME}/bin
+export PATH=$PATH:${JAVA_PATH}:$PATH
+```
 
 
 
@@ -2291,13 +2371,13 @@ Hadoop生态体系中总共会出现如下进程角色：
 
 10. 分发hadoop到其它机器
 
-   ```shell
+```shell
    # 在node1执行
    cd /export/server
    
    scp -r hadoop-3.3.0 node2:`pwd`/
    scp -r hadoop-3.3.0 node2:`pwd`/
-   ```
+```
 
 11. 在node2、node3执行
 

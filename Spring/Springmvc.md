@@ -341,13 +341,14 @@ public class MyBatisConfig {
     public SqlSessionFactoryBean sqlSessionFactory(DataSource dataSource){
         SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
         factoryBean.setDataSource(dataSource);
-
         return factoryBean;
     }
 
+   
     @Bean
     public MapperScannerConfigurer mapperScannerConfigurer(){
         MapperScannerConfigurer msc = new MapperScannerConfigurer();
+         //这个就是相当于mybatis中的包扫描
         msc.setBasePackage("com.dao");
         return msc;
     }
