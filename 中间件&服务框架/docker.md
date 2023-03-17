@@ -8,7 +8,7 @@
 
 ## 安装Docker
 
-```linux
+```shell
 # 1、yum 包更新到最新 
 yum update
 # 2、安装需要的软件包， yum-util 提供yum-config-manager功能，另外两个是devicemapper驱动依赖的 
@@ -23,13 +23,13 @@ docker -v
 
 当发生如下报错
 
-```yum
+```shell
 Error: Failed to download metadata for repo 'appstream': Cannot prepare internal mirrorlist: No URLs in mirrorlist
 ```
 
 依次执行  （这个是发生错误了之后在执行）
 
-```
+```shell
 cd /etc/yum.repos.d/
 sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
 sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
@@ -69,36 +69,31 @@ yum update -y
 
 ### 启动docker服务
 
-```
-BASH
+```shell
 systemctl start docker
 ```
 
 ### 停止docker服务
 
-```
-BASH
+```shell
 systemctl stop docker
 ```
 
 ### 重启docker服务
 
-```
-BASH
+```shell
 systemctl restart docker
 ```
 
 ### 查看docker服务状态
 
-```
-BASH
+```shell
 systemctl status docker
 ```
 
 ### 设置开机启动docker服务
 
-```
-BASH
+```shell
 systemctl enable docker
 ```
 
@@ -116,9 +111,10 @@ systemctl enable docker
 
 查看本地所有的镜像
 
-```
-BASH
+```shell
 docker images
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+第一次使用这个就只显示这个
 docker images –q # 查看所用镜像的id
 ```
 
@@ -126,8 +122,7 @@ docker images –q # 查看所用镜像的id
 
 从网络中查找需要的镜像
 
-```
-BASH
+```shell
 docker search 镜像名称
 ```
 
@@ -135,17 +130,18 @@ docker search 镜像名称
 
 从Docker仓库下载镜像到本地，镜像名称格式为 名称:版本号，如果版本号不指定则是最新的版本。 如果不知道镜像版本，可以去docker hub 搜索对应镜像查看。
 
-```
-BASH
+```shell
 docker pull 镜像名称
+docker pull 镜像名称 : 加版本号
 ```
 
 ### 删除镜像
 
 删除本地镜像
 
-```
-BASH
+![image-20230316144410574](typora图片/image-20230316144410574.png)
+
+```shell
 docker rmi 镜像id # 删除指定本地镜像
 docker rmi `docker images -q` # 删除所有本地镜像
 ```
@@ -154,7 +150,7 @@ docker rmi `docker images -q` # 删除所有本地镜像
 
 查看指定镜像版本
 
-```
+```shell
 HTTP
 https://hub.docker.com
 ```
@@ -171,17 +167,18 @@ https://hub.docker.com
 
 ### 查看容器
 
-```
-BASH
+```shell
+
 docker ps # 查看正在运行的容器 
 docker ps –a # 查看所有容器
 ```
 
 ### 创建并启动容器
 
-```
+```shell
 BASH
 docker run 参数
+docker run -id --name=容器名称 使用的镜像:镜像的版本 
 ```
 
 参数说明:
@@ -198,9 +195,10 @@ docker run 参数
 
 以后台方式运行容器，并进入容器
 
-```
+```shell
 BASH
 [root@hecs-33111 ~]# docker run -id --name=c2 redis:5.0 /bin/bash
+这个是在后台创建
 3842cee27f9b97fa7fb512aa53f835351f38860ffd5a4dc0e19b9e36d7aadf54
 [root@hecs-33111 ~]# docker exec -it c2 /bin/bash
 root@3842cee27f9b:/data# 
@@ -210,22 +208,19 @@ root@3842cee27f9b:/data#
 
 ### 进入容器
 
-```
-BASH
+```shell
 docker exec 参数 # 退出容器，容器不会关闭
 ```
 
 ### 停止容器
 
-```
-BASH
+```shell
 docker stop 容器名称
 ```
 
 ### 启动容器
 
-```
-BASH
+```shell
 docker start 容器名称
 ```
 
@@ -233,15 +228,15 @@ docker start 容器名称
 
 如果容器是运行状态则删除失败，需要停止容器才能删除
 
-```
-BASH
+```shell
 docker rm 容器名称
+docker rm '容器id'//删除指定容器
+docker rm 'docker ps -aq'//删除所有容器
 ```
 
 ### 查看容器信息
 
-```
-BASH
+```shell
 docker inspect 容器名称
 ```
 
@@ -263,7 +258,7 @@ docker inspect 容器名称
 
 ## 配置数据卷
 
-```
+```shell
 BASH
 docker run ... –v 宿主机目录(文件):容器内目录(文件) ...
 ```
@@ -274,7 +269,7 @@ docker run ... –v 宿主机目录(文件):容器内目录(文件) ...
 
 创建centos容器
 
-```
+```shell
 BASH
 docker run -it --name=c3 -v /root/data:/root/data_container centos /bin/bash
 ```
@@ -319,7 +314,7 @@ docker run -it --name=c3 -v /root/data:/root/data_container centos /bin/bash
 
 一个容器内同步多个数据卷
 
-```
+```shell
 BASH
 docker run -it --name=c2 -v ~/data2:/root/data2 -v ~/data3:/root/data3 centos
 ```
@@ -354,15 +349,13 @@ docker run -it --name=c2 -v ~/data2:/root/data2 -v ~/data3:/root/data3 centos
 
 1. 创建启动c3数据卷容器，使用 –v 参数 设置数据卷
 
-```
-BASH
+```shell
 docker run –it --name=c3 –v /volume centos:7 /bin/bash
 ```
 
 1. 创建启动 c1 c2 容器，使用 –-volumes-from 参数 设置数据卷
 
-```
-BASH
+```shell
 docker run –it --name=c1 --volumes-from c3 centos:7 /bin/bash 
 docker run –it --name=c2 --volumes-from c3 centos:7 /bin/bash
 ```
@@ -371,7 +364,7 @@ docker run –it --name=c2 --volumes-from c3 centos:7 /bin/bash
 
 创建数据卷容器c3和两个测试同步容器
 
-```
+```shell
 PLAINTEXT
 [root@hecs-33111 data]# docker run -id --name=c3 -v /volume centos
 5a43ebf4f327441ae82f9fdebe640f88125f03e35ddfd34e5a7e21982f39a48c
@@ -383,7 +376,7 @@ f8cc38cff52549d6be3e3604d679b1556fda4c5ad1641a1cee4bde7fc63da9d4
 
 在c1容器内修改数据
 
-```
+```shell
 PLAINTEXT
 [root@hecs-33111 data]# docker exec -it c1 /bin/bash
 [root@e2ceb7739b1f /]# cd volume/
@@ -413,7 +406,7 @@ test.txt
 
 ### 搜索mysql镜像
 
-```
+```shell
 SHELL
 docker search mysql
 ```
@@ -422,7 +415,7 @@ docker search mysql
 
 ### 拉取mysql镜像
 
-```
+```shell
 SHELL
 docker pull mysql:5.6
 ```
@@ -431,8 +424,7 @@ docker pull mysql:5.6
 
 ### 创建容器，设置端口映射、目录映射
 
-```
-SHELL
+```shell
 # 在/root目录下创建mysql目录用于存储mysql数据信息
 mkdir ~/mysql
 cd ~/mysql
@@ -464,14 +456,14 @@ mysql:5.6
 
 ### 搜索tomcat镜像
 
-```
+```shell
 SHELL
 docker search tomcat
 ```
 
 ### 拉取tomcat镜像
 
-```
+```shell
 SHELL
 docker pull tomcat
 ```
@@ -480,7 +472,7 @@ docker pull tomcat
 
 ### 创建容器，设置端口映射、目录映射
 
-```
+```shell
 SHELL
 # 在/root目录下创建tomcat目录用于存储tomcat数据信息
 mkdir ~/tomcat
@@ -502,29 +494,27 @@ tomcat
 
 ### 使用外部机器访问tomcat
 
-[![1573649804623](https://weishao-996.github.io/Users/xuwei/Desktop/codeLearning/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98docker/%E8%B5%84%E6%96%99/imgs/1573649804623.png)](https://weishao-996.github.io/Users/xuwei/Desktop/codeLearning/黑马程序员docker/资料/imgs/1573649804623.png)
-
 ## Nginx部署
 
 [![image-20221119214456006](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Docker/image-20221119214456006.png)](https://weishao-996.github.io/img/黑马程序员-Docker/image-20221119214456006.png)
 
 ### 搜索nginx镜像
 
-```
+```shell
 SHELL
 docker search nginx
 ```
 
 ### 拉取nginx镜像
 
-```
+```shell
 SHELL
 docker pull nginx
 ```
 
 ### 创建容器，设置端口映射、目录映射
 
-```
+```shell
 SHELL
 # 在/root目录下创建nginx目录用于存储nginx数据信息
 mkdir ~/nginx
@@ -589,21 +579,21 @@ nginx
 
 ### 搜索redis镜像
 
-```
+```shell
 SHELL
 docker search redis
 ```
 
 ### 拉取redis镜像
 
-```
+```shell
 SHELL
 docker pull redis:5.0
 ```
 
 ### 创建容器，设置端口映射
 
-```
+```shell
 SHELL
 docker run -id --name=c_redis -p 6379:6379 redis:5.0
 ```
@@ -612,7 +602,7 @@ docker run -id --name=c_redis -p 6379:6379 redis:5.0
 
 ### 使用外部机器连接redis
 
-```
+```shell
 SHELL
 ./redis-cli.exe -h 192.168.149.135 -p 6379
 ```
@@ -628,6 +618,8 @@ SHELL
 [![image-20221120131008869](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Docker/image-20221120131008869.png)](https://weishao-996.github.io/img/黑马程序员-Docker/image-20221120131008869.png)
 
 [![image-20221120131751168](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Docker/image-20221120131751168.png)](https://weishao-996.github.io/img/黑马程序员-Docker/image-20221120131751168.png)
+
+![image-20230317112525780](typora图片/image-20230317112525780.png)
 
 ## **镜像制作**
 
@@ -688,7 +680,7 @@ SHELL
 
 创建dockerfile文件并编辑
 
-```
+```shell
 SHELL
 FROM java:8
 MAINTAINER itheima <itheima@itcast.cn>
@@ -698,7 +690,7 @@ CMD java -jar app.jar
 
 根据dockerfile制作镜像
 
-```
+```shell
 PLAINTEXT
 docker build -f ./springboot_dockerfile -t app .
 ```
@@ -707,7 +699,7 @@ docker build -f ./springboot_dockerfile -t app .
 
 启动并做端口映射
 
-```
+```shell
 SHELL
 docker run -id -p 9000:8080 app
 ```
@@ -724,7 +716,7 @@ docker run -id -p 9000:8080 app
 
 编辑dockerfile文件
 
-```
+```shell
 SHELL
 [root@hecs-33111 docker-files]# vim centos_dockerfile
 BASH
@@ -737,7 +729,7 @@ CMD /bin/bash
 
 构建镜像
 
-```
+```shell
 SHELL
 [root@hecs-33111 docker-files]# docker build -f centos_dockerfile -t itheima_centos:1 .
 ```
@@ -746,7 +738,7 @@ SHELL
 
 创建容器
 
-```
+```shell
 SHELL
 docker run -it --name=c5 itheima_centos:1
 ```
@@ -771,7 +763,7 @@ docker run -it --name=c5 itheima_centos:1
 
 ### 一、安装Docker Compose
 
-```
+```shell
 SHELL
 # Compose目前已经完全支持Linux、Mac OS和Windows，在我们安装Compose之前，需要先安装Docker。下面我 们以编译好的二进制包方式安装在Linux系统中。 
 curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
@@ -785,7 +777,7 @@ docker-compose -version
 
 ### 二、卸载Docker Compose
 
-```
+```shell
 SHELL
 # 二进制包方式安装的，删除二进制文件即可
 rm /usr/local/bin/docker-compose
@@ -795,7 +787,7 @@ rm /usr/local/bin/docker-compose
 
 1. 创建docker-compose目录
 
-```
+```shell
 SHELL
 mkdir ~/docker-compose
 cd ~/docker-compose
@@ -803,7 +795,7 @@ cd ~/docker-compose
 
 1. 编写 docker-compose.yml 文件
 
-```
+```shell
 SHELL
 version: '3'
 services:
@@ -825,7 +817,7 @@ services:
 
 1. 创建./nginx/conf.d目录
 
-```
+```shell
 SHELL
 mkdir -p ./nginx/conf.d
 ```
@@ -834,7 +826,7 @@ mkdir -p ./nginx/conf.d
 
 1. 在./nginx/conf.d目录下 编写itheima.conf文件
 
-```
+```shell
 SHELL
 server {
     listen 80;
@@ -851,7 +843,7 @@ server {
 
 1. 在~/docker-compose 目录下 使用docker-compose 启动容器
 
-```
+```shell
 SHELL
 docker-compose up
 ```
@@ -860,7 +852,7 @@ docker-compose up
 
 1. 测试访问
 
-```
+```shell
 SHELL
 http://192.168.149.135/hello
 ```
@@ -875,7 +867,7 @@ http://192.168.149.135/hello
 
 ### 一、私有仓库搭建
 
-```
+```shell
 SHELL
 # 1、拉取私有仓库镜像 
 docker pull registry
@@ -899,7 +891,7 @@ docker start registry
 
 ### 二、将镜像上传至私有仓库
 
-```
+```shell
 SHELL
 # 1、标记镜像为私有仓库的镜像     
 docker tag centos:7 私有仓库服务器IP:5000/centos:7
@@ -916,7 +908,7 @@ docker push 私有仓库服务器IP:5000/centos:7
 
 ### 三、 从私有仓库拉取镜像
 
-```
+```shell
 SHELL
 #拉取镜像 
 docker pull 私有仓库服务器ip:5000/centos:7

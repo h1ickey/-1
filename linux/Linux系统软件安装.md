@@ -752,6 +752,7 @@ Tomcat的安装非常简单，主要分为2部分：
 
    ```shell
    ln -s /export/server/jdk1.8.0_351 /export/server/jdk
+   ln -s /export/server/jdk1.8.0_181 /export/server/jdk
    ln -s /home/java/jdk1.8.0_181 /home/java/jdk
    ```
 
@@ -832,40 +833,31 @@ Tomcat的安装非常简单，主要分为2部分：
    passwd tomcat
    ```
 
-3. 下载Tomcat安装包
-
-   ```shell
-   # 使用root用户操作
-   wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.0.27/bin/apache-tomcat-10.0.27.tar.gz
-   # 如果出现https相关错误，可以使用--no-check-certificate选项
-   wget --no-check-certificate https://dlcdn.apache.org/tomcat/tomcat-10/v10.0.27/bin/apache-tomcat-10.0.27.tar.gz
-   ```
-
-   > 如果Linux内下载过慢，可以复制下载链接在Windows系统中使用迅雷等软件加速下载然后上传到Linux内即可
-   >
-   > 或者使用课程资料中提供的安装包
-
-4. 解压Tomcat安装包
+3. 解压Tomcat安装包
 
    ```shell
    # 使用root用户操作，否则无权限解压到/export/server内，除非修改此文件夹权限
    tar -zxvf apache-tomcat-10.0.27.tar.gz -C /export/server
    ```
 
-5. 创建Tomcat软链接
+4. 创建Tomcat软链接
 
    ```shell
    # 使用root用户操作
    ln -s /export/server/apache-tomcat-10.0.27 /export/server/tomcat
    ```
 
-6. 修改tomcat安装目录权限
+5. 修改tomcat安装目录权限*
+
+6. 
 
    ```shell
    # 使用root用户操作，同时对软链接和tomcat安装文件夹进行修改，使用通配符*进行匹配
    chown -R tomcat:tomcat /export/server/*tomcat*
    #在bin目录下 执行该命令
    chmod u+x *.sh
+   *进入 apache-tomcat-9.0.65/bin 目录下**
+   执行 chmod 777 ./* 命令将当前目录下的所有文件提至最高权限。
    ```
 
 7. 切换到tomcat用户![image-20230315002108742](typora图片/image-20230315002108742.png)
@@ -900,60 +892,6 @@ Tomcat的安装非常简单，主要分为2部分：
 
 至此，Tomcat安装配置完成。
 
-![image-20230315005439440](typora图片/image-20230315005439440.png)
-
-**3、进入 apache-tomcat-9.0.65/bin 目录下**
-
-执行 chmod 777 ./* 命令将当前目录下的所有文件提至最高权限。
-
-4、配置环境变量
-
-```vim
-root@localhost ~]# vim /etc/profile 
-```
-
-添加以下内容：
-
-```vim
-#tomcat
-export TOMCAT_HOME=/usr/local/tomcat/apache-tomcat-9.0.65
-
-export CATALINA_HOME=/usr/local/tomcat/apache-tomcat-9.0.65
-```
-
- 此外：
-
-```vim
-[root@localhost ~]# vim /usr/local/tomcat/apache-tomcat-9.0.65/bin/setclasspath.sh
-```
-
-添加以下内容：
-
-```vim
-export JAVA_HOME=/usr/local/java/jdk1.8.0_341
-
-export JRE_HOME=${JAVA_HOME}/jre
-```
-
-5、开放8080端口
-
-6、启动tomcat
-
-进入 tomcat/bin 目录下执行 ./startup.sh 命令
-
-```vim
-[root@localhost bin]# ./startup.sh
-Using CATALINA_BASE:   /usr/local/tomcat/apache-tomcat-9.0.65
-Using CATALINA_HOME:   /usr/local/tomcat/apache-tomcat-9.0.65
-Using CATALINA_TMPDIR: /usr/local/tomcat/apache-tomcat-9.0.65/temp
-Using JRE_HOME:        /usr/local/java/jdk1.8.0_341/jre
-Using CLASSPATH:       /usr/local/tomcat/apache-tomcat-9.0.65/bin/bootstrap.jar:/usr/local/tomcat/apache-tomcat-9.0.65/bin/tomcat-juli.jar
-Using CATALINA_OPTS:   
-Tomcat started.
-```
-
-启动成功，可以访问：
-
 ![image-20230315193308816](typora图片/image-20230315193308816.png)
 
 ```linux
@@ -961,8 +899,6 @@ yum install httpd
 systemctl enable httpd
 systemctl start httpd
 ```
-
-![image-20230315195108360](typora图片/image-20230315195108360.png)
 
 ```linux
 unset i
@@ -974,8 +910,6 @@ export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib:$CLASSPATH
 export JAVA_PATH=${JAVA_HOME}/bin:${JRE_HOME}/bin:${CATALINA_HOME}/bin
 export PATH=$PATH:${JAVA_PATH}:$PATH
 ```
-
-
 
 # Nginx安装部署【简单】
 
@@ -989,15 +923,11 @@ export PATH=$PATH:${JAVA_PATH}:$PATH
 
 Nginx在WEB开发领域，基本上也是必备组件之一了。
 
-
-
 ## 安装
 
 Nginx同样需要配置额外的yum仓库，才可以使用yum安装
 
 > 安装Nginx的操作需要root身份
-
-
 
 1. 安装yum依赖程序
 
