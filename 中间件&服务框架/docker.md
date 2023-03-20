@@ -212,6 +212,8 @@ root@3842cee27f9b:/data#
 docker exec 参数 # 退出容器，容器不会关闭
 ```
 
+![image-20230320154622775](typora图片/image-20230320154622775.png)
+
 ### 停止容器
 
 ```shell
@@ -693,6 +695,9 @@ CMD java -jar app.jar
 ```shell
 PLAINTEXT
 docker build -f ./springboot_dockerfile -t app .
+
+-f 指定路径
+-t 
 ```
 
 [![image-20221120170212253](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Docker/image-20221120170212253.png)](https://weishao-996.github.io/img/黑马程序员-Docker/image-20221120170212253.png)
@@ -923,3 +928,7 @@ docker pull 私有仓库服务器ip:5000/centos:7
 [![image-20221120205102272](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Docker/image-20221120205102272.png)](https://weishao-996.github.io/img/黑马程序员-Docker/image-20221120205102272.png)
 
 ## Docker容器化虚拟化与传统虚拟机比较
+
+![image-20230320194551522](typora图片/image-20230320194551522.png)
+
+![image-20230320194901494](typora图片/image-20230320194901494.png)
