@@ -315,11 +315,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@Configuration
-@ComponentScan({"com.service"})
-@PropertySource("classpath:jdbc.properties")
-@Import({JdbcConfig.class,MyBatisConfig.class})
-@EnableTransactionManagement
+@Configuration//配置这个就是代表是配置的
+@EnableTransactionManagement//开启事务管理
+@PropertySource("classpath:jdbc.properties")//加载数据库的相关信息
+@Import({JdbcConfig.class, MybatisConfig.class})
+//用这个的话，在JdbcConfig、MybatisConfig上面就不用加@Configuration了
+@ComponentScan("{com.service}")
+/*
+主要的作用就是定义包扫描的规则，然后根据定义的规则找出哪些需类需要自动装配到spring的bean容器中，然后交由spring进行统一管理。
+说明：针对标注了@Controller、@Service、@Repository、@Component 的类都可以别spring扫描到。
+ */
 public class SpringConfig {
 }
 ```
@@ -336,7 +341,11 @@ import org.springframework.context.annotation.Bean;
 import javax.sql.DataSource;
 
 public class MyBatisConfig {
-
+/**
+     * 初始化工厂，将Durid数据池加载进工厂
+     * @param dataSource
+     * @return
+     */
     @Bean
     public SqlSessionFactoryBean sqlSessionFactory(DataSource dataSource){
         SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
@@ -344,7 +353,10 @@ public class MyBatisConfig {
         return factoryBean;
     }
 
-   
+   /**
+     * 设置mybatis的扫描路径
+     * @return
+     */
     @Bean
     public MapperScannerConfigurer mapperScannerConfigurer(){
         MapperScannerConfigurer msc = new MapperScannerConfigurer();
@@ -387,6 +399,7 @@ public class JdbcConfig {
         return dataSource;
     }
 
+    //开启事务
     @Bean
     public PlatformTransactionManager transactionManager(DataSource dataSource){
         DataSourceTransactionManager ds = new DataSourceTransactionManager();
@@ -418,6 +431,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @ComponentScan({"com.controller","com.config"})
 @EnableWebMvc
+//
 public class SpringMvcConfig {
 }
 ```
@@ -430,15 +444,21 @@ public class SpringMvcConfig {
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class ServletConfig extends AbstractAnnotationConfigDispatcherServletInitializer {
+     @Override
     protected Class<?>[] getRootConfigClasses() {
+        //返回的带有@Configuration注解的类用来配置
         return new Class[]{SpringConfig.class};
     }
 
+    @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{SpringMvcConfig.class};
+        //返回的带有@Configuration注解的类用来配置DispatcherServlet
+        return new Class[]{springMvc.class};
     }
 
+    @Override
     protected String[] getServletMappings() {
+        //将一个或多个路径映射到DispatcherServlet上
         return new String[]{"/"};
     }
 }
@@ -453,9 +473,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 
 @Configuration
 public class SpringMvcSupport extends WebMvcConfigurationSupport {
-    @Override
+  
+        @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         //当访问/page/？？？时候不要走mvc/走page目录下的内容
+        //能指定静态资源的路径可以加载静态资源
+        /*
+        addResourceHandler：添加URL响应地址目录。
+        addResourceLocations：添加实际资源目录。
+         */
         registry.addResourceHandler("/pages/**").addResourceLocations("/pages/");
         registry.addResourceHandler("/css/**").addResourceLocations("/css/");
         registry.addResourceHandler("/js/**").addResourceLocations("/js/");
