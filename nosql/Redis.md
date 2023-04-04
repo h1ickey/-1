@@ -323,10 +323,10 @@ Tips 2:
 - 数据操作不成功的反馈与数据正常操作之间的差异
   - 1、表示运行结果是否成功
      `（integer)0–>false `失败
-     `（integer)1–>true `成功
+       `（integer)1–>true `成功
   - 2、表示运行结果值
      `（integer)3–>3 `3个
-     `（integer)1–>1 `1个
+       `（integer)1–>1 `1个
 - 数据未获取到`(nil）`等同于`null`
 - 数据最大存储量`512MB`
 - 数值计算最大范围（java中的long的最大值）
@@ -1825,6 +1825,8 @@ save 60 10000
 
 [![image-20221011142306626](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Redis/image-20221011142306626.png)](https://weishao-996.github.io/img/黑马程序员-Redis/image-20221011142306626.png)
 
+**执行删除那些操作都会发生变化**
+
 #### RDB启动方式 ——save配置原理
 
 [![image-20221011142546510](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Redis/image-20221011142546510.png)](https://weishao-996.github.io/img/黑马程序员-Redis/image-20221011142546510.png)
@@ -1912,6 +1914,8 @@ shutdown save
 
 ### AOF相关配置
 
+![image-20230324125347844](typora图片/image-20230324125347844.png)
+
 **配置**
 
 ```shell
@@ -1976,17 +1980,20 @@ OK
 
 #### 重写方式
 
+![image-20230324130529336](typora图片/image-20230324130529336.png)
+
 - 手动重写
 
 ```shell
 SHELL
-bgrewriteaof
+bgrewriteaof #这个操作是直接在redis的窗口下面使用
 ```
 
 - 自动重写
 
 ```shell
 SHELL
+#这两个是在配置文件里面的写的
 auto-aof-rewrite-min-size size
 auto-aof-rewrite-percentage percentage
 ```
@@ -2015,6 +2022,23 @@ Background append only file rewriting started
 
 [![image-20221012100544751](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Redis/image-20221012100544751.png)](https://weishao-996.github.io/img/黑马程序员-Redis/image-20221012100544751.png)
 
+#### redis-6379.cong的配置文件
+
+```shell
+bind 127.0.0.1 -::1
+port 6379     #redis的端口号
+dir ./        #这个是设置那些配置和日志的存放的位置
+logfile "6379.log"   #设置日志文件
+dbfilename dumpp-6379.rdb    #设置rdb的配置文件的文件名称
+save 10 2    #开启rdb的自动保存   用配置文件的方式是采用默认的bgsave
+rdbcomppression yes
+rdbchecksum yes  
+appendonly yes   #开启aof持久化功能
+appendfsync always   #aof每一次操作都保存一次
+appendfilename appendonly-63799.aof   #这个是配置aof的文件名称
+
+```
+
 #### AOF手动重写 —— bgrewriteaof指令工作原理
 
 [![image-20221012102219574](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Redis/image-20221012102219574.png)](https://weishao-996.github.io/img/黑马程序员-Redis/image-20221012102219574.png)
@@ -2025,7 +2049,7 @@ Background append only file rewriting started
 
 ```shell
 SHELL
-auto-aof-rewrite-min-size size
+auto-aof-rewrite-min-size size  #配置的大小
 auto-aof-rewrite-percentage percent
 ```
 
@@ -2033,13 +2057,15 @@ auto-aof-rewrite-percentage percent
 
 ```shell
 SHELL
-aof_current_size
+aof_current_size #当前的大小
 aof_base_size
 ```
 
 - 自动重写触发条件
 
 [![image-20221012102721225](https://weishao-996.github.io/img/%E9%BB%91%E9%A9%AC%E7%A8%8B%E5%BA%8F%E5%91%98-Redis/image-20221012102721225.png)](https://weishao-996.github.io/img/黑马程序员-Redis/image-20221012102721225.png)
+
+**要当前的大小要大于配置的大小，这个自动重写就会执行**
 
 ### AOF工作流程
 

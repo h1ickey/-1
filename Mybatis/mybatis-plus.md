@@ -2895,7 +2895,7 @@ mybatis-plus.global-config.db-config.logic-not-delete-value=0
 
 ## 6.3、测试
 
-```
+```java
 JAVA
 @Test
 public void testDeleteByIdLogic(){
@@ -2905,7 +2905,7 @@ public void testDeleteByIdLogic(){
 
 执行的sql：
 
-```
+```sql
 PLAINTEXT
 2022-11-01 15:44:46.718 DEBUG 8030 --- [           main] c.i.mp.mapper.UserMapper.deleteById      : ==>  Preparing: UPDATE tb_user SET deleted=1 WHERE id=? AND deleted=0 
 2022-11-01 15:44:46.760 DEBUG 8030 --- [           main] c.i.mp.mapper.UserMapper.deleteById      : ==> Parameters: 4(Long)
@@ -2916,7 +2916,7 @@ PLAINTEXT
 
 测试查询：
 
-```
+```bash
 BASH
 2022-11-01 15:47:12.683 DEBUG 8043 --- [           main] c.i.mp.mapper.UserMapper.selectById      : ==>  Preparing: SELECT id,user_name,name,age,email AS mail,version,deleted FROM tb_user WHERE id=? AND deleted=0 
 2022-11-01 15:47:12.727 DEBUG 8043 --- [           main] c.i.mp.mapper.UserMapper.selectById      : ==> Parameters: 4(Long)
@@ -2931,7 +2931,7 @@ BASH
 
 ## 12.1、修改表结构
 
-```
+```sql
 SQL
 ALTER TABLE `tb_user`
 ADD COLUMN `sex` int(1) NULL DEFAULT 1 COMMENT '1-男，2-女' AFTER `deleted`;
@@ -2939,7 +2939,7 @@ ADD COLUMN `sex` int(1) NULL DEFAULT 1 COMMENT '1-男，2-女' AFTER `deleted`;
 
 ## 12.2、定义枚举
 
-```
+```java
 JAVA
 package cn.itcast.mp.enums;
 

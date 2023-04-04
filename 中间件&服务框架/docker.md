@@ -179,6 +179,8 @@ docker ps –a # 查看所有容器
 BASH
 docker run 参数
 docker run -id --name=容器名称 使用的镜像:镜像的版本 
+
+docker run -d -p 8080:8080 --name tomcatqaq tomcat
 ```
 
 参数说明:
@@ -188,6 +190,10 @@ docker run -id --name=容器名称 使用的镜像:镜像的版本
 - `-d`:以守护(后台)模式运行容器。创建一个容器在后台运行，需要使用docker exec 进入容器。退出后，容器不会关闭。
 - `-it `创建的容器一般称为交互式容器，-id 创建的容器一般称为守护式容器
 - `--name`:为创建的容器命名。
+
+![image-20230403143810095](typora图片/image-20230403143810095.png)
+
+
 
 演示
 
@@ -439,6 +445,9 @@ docker run -id \
 -v $PWD/data:/var/lib/mysql \
 -e MYSQL_ROOT_PASSWORD=123456 \
 mysql:5.6
+
+在进去到数据库
+mysql -uroot -p 密码
 ```
 
 - 参数说明：
@@ -484,6 +493,11 @@ docker run -id --name=c_tomcat \
 -p 8080:8080 \
 -v $PWD:/usr/local/tomcat/webapps \
 tomcat 
+
+
+
+进去tomcat容器
+docker exec -it 容器名称 /bin/bash
 ```
 
 - 参数说明：
